@@ -34,9 +34,26 @@ const Input = () => {
   );
 };
 
-export const App = () => (
-  <div className='App'>
-    <Input />
-    <InputWithRef />
-  </div>
-);
+const InputWithExternalState = (props: { valueInput: string; externalSetState: React.Dispatch<React.SetStateAction<string>> }) => {
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    props.externalSetState(e.target.value);
+  };
+
+  return (
+    <>
+      <input value={props.valueInput} onChange={onChangeInput} name='value3' />
+    </>
+  );
+};
+
+export const App = () => {
+  const [valueInput3, setValue3] = useState('');
+  return (
+    <div className='App'>
+      <Input />
+      <InputWithRef />
+      <InputWithExternalState externalSetState={setValue3} valueInput={valueInput3} />
+      <div>valueInputWithExternalState = {valueInput3}</div>
+    </div>
+  );
+};
