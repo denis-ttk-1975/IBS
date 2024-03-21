@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from 'react';
+import React, { useState, useRef, forwardRef, useEffect } from 'react';
 
 const Input = () => {
   const [valueInput, setValue] = useState('');
@@ -64,18 +64,81 @@ const InputWithForwardRef = forwardRef((props: { valueInput: string; externalSet
   );
 });
 
+const useCountdown = (initCount: number) => {
+    const [time, setCounter] = useState<number>(initCount);
+  
+    let timeoutID: NodeJS.Timeout;
+  
+    useEffect(() => {
+      timeoutID = setTimeout(() => {
+        if (time === 0) {
+          clearTimeout(timeoutID);
+          return;
+        }
+        setCounter((prev) => {
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearTimeout(timeoutID);
+    }, [initCount, time]);
+  
+    const reset = () => {
+      clearTimeout(timeoutID);
+      setCounter(() => {
+        return 10;
+      });
+    };
+  
+    return [time, reset];
+  };
+
 export const App = () => {
   const [valueInput3, setValue3] = useState('');
   const refForwardValue = useRef(null);
   const [valueInput4, setValue4] = useState('');
+  const [counter1, setCounter1] = useState(0);
+  const [counter2, setCounter2] = useState(0);
+
+  let [time, reset] = useCountdown(10);
+ 
+
+  useEffect(() => {
+   console.log("Hello from App");
+  });
+  
+  const handleClick = () => {
+  	
+     setCounter1((c) => ++c)
+     setCounter2((c) => ++c)
+   
+  }
+
   return (
-    <div className='App'>
-      <Input />
-      <InputWithRef />
-      <InputWithExternalState externalSetState={setValue3} valueInput={valueInput3} />
-      <div>valueInputWithExternalState = {valueInput3}</div>
-      <InputWithForwardRef externalSetState={setValue4} valueInput={valueInput4} ref={refForwardValue} />
-      <div>valueInputWithForwardRef = {valueInput4}</div>
+    <>
+        <div className='App'>
+            <Input />
+            <InputWithRef />
+            <InputWithExternalState externalSetState={setValue3} valueInput={valueInput3} />
+            <div>valueInputWithExternalState = {valueInput3}</div>
+            <InputWithForwardRef externalSetState={setValue4} valueInput={valueInput4} ref={refForwardValue} />
+            <div>valueInputWithForwardRef = {valueInput4}</div>
+        </div>
+
+        <div className="App">
+            <button onClick={handleClick}>Click</button>
+            <div>{counter1}</div>
+            <div>{counter2}</div>
+        </div>
+        <div>
+
+        <div style={{ fontSize: 50, textAlign: "center" }}>COUNTDOWN TIMER</div>
+        <div style={{ fontSize: 100, textAlign: "center" }}> {typeof time === 'number' ? time : null}</div>
+        <div style={{ textAlign: "center" }}>
+        <button style={{ fontSize: 50 }} onClick={reset as (() => void)}>
+            reset
+        </button>
+        </div>
     </div>
-  );
+    </>
+);
 };
